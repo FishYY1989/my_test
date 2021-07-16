@@ -9,36 +9,42 @@
         .active {
             background-color: #ddd;
         }
+        .message-box {
+            padding: 10px 20px;
+            background: #4fc08d;
+            border: 1px solid #42b983;
+        }
+        .message-box-close {
+            float: right;
+        }
     </style>
 </head>
 <body>
     <!--宿主文件-->
     <div id="app">
+        <!-- 弹窗组件 -->
+        <message :show.sync="show">
+            <!-- 命名为title插槽内容 -->
+            <template v-slot:title>
+                <strong>恭喜</strong>
+            </template>
+            <!-- 默认插槽内容 -->
+            <template v-slot:default>
+                新增课程成功！
+            </template>
+            
+        </message>
+
         <h2 :title="title">
             <!--插值文本-->
             {{title}}
         </h2>
 
-        <!--用户输入-->
-        <p>
-            <input type="text" v-model="course" v-on:keydown.enter="addCourse">
-            <button @click="addCourse">新增</button>
-        </p>
+        <!-- 新增课程 -->
+        <course-add v-model="course" @add-course="addCourse"></course-add>
 
-        <!--条件渲染-->
-        <p v-if="courses.length == 0">没有任何课程信息</p>
-        <!--列表渲染-->
-        <!-- <div v-for="c in courses" :key="c" :class="{active: selectedCourse === c}" @click="selectedCourse = c">
-            {{ c }}
-        </div> -->
-
-        <!--style-->
-        <div class="course-list" v-else>
-            <div v-for="c in courses" :key="c" :style="{backgroundColor: (selectedCourse === c ? '#ddd' : 'transparent')}" 
-                @click="selectedCourse = c">
-                {{ c }}
-            </div>
-        </div>
+        <!-- 列表组件 -->
+        <course-list :courses="courses"></course-list>
 
         <!-- 商品总数 -->
         <p>
@@ -52,6 +58,78 @@
     </div>
     <script src="vue.js"></script>
     <script>
+        //弹窗组件
+        Vue.component('message', {
+            props: ['show'],
+            template:`
+                <div class="message-box" v-if="show">
+                    <!--具名插槽-->
+                    <slot name="title">默认标题</slot>
+                    <!--通过slot获取传入内容-->
+                    <slot></slot>
+                    <span class="message-box-close" 
+                        @click="$emit('update:show', false)">X</span>
+                </div>
+            `
+        })
+
+        //课程新增组件
+        Vue.component('course-add',{
+            props: ['value'],
+            template:`
+            <div>
+                <!--用户输入-->
+                <p>
+                    <input type="text" :value="value" 
+                    @input="onInput"
+                    v-on:keydown.enter="addCourse">
+                    <button @click="addCourse">新增</button>
+                </p>
+            </div>
+            `,
+            methods: {
+                addCourse() {
+                    //派发事件通知父组件新增课程
+                    this.$emit('add-course')
+                },
+                onInput(e){
+                    this.$emit('input', e.target.value)
+                }
+            },
+        })
+
+        //课程列表组件
+        Vue.component('course-list', {
+            data(){
+                return{
+                    selectedCourse: ''
+                }
+            },
+            props: {
+                courses:{
+                    type: Array,
+                    default: []
+                }
+            },
+            template:`
+            <div>
+                <!--条件渲染-->
+                <p v-if="courses.length == 0">没有任何课程信息</p>
+                <!--列表渲染-->
+                <!-- <div v-for="c in courses" :key="c" :class="{active: selectedCourse === c}" @click="selectedCourse = c">
+                    {{ c }}
+                </div> -->
+
+                <!--style-->
+                <div class="course-list" v-else>
+                    <div v-for="c in courses" :key="c" :style="{backgroundColor: (selectedCourse === c ? '#ddd' : 'transparent')}" 
+                        @click="selectedCourse = c">
+                        {{ c }}
+                    </div>
+                </div>
+            </div>
+            `
+        })
         //模拟异步数据调用
         function getCourses(){
             return new Promise(resolve =>{
@@ -67,10 +145,10 @@
             data(){
                 return{
                     title: '我的购物车',
-                    course: '',
-                    selectedCourse: '',
+                    course : '',
                     courses: [],
-                    totalCount: 0
+                    totalCount: 0,
+                    show: false
                 }
             },
             async created(){
@@ -81,10 +159,12 @@
             // mounted(){},
             methods:{
                 addCourse(){
-                    //1.添加course到数组
+                    //添加course到数组
                     this.courses.push(this.course)
-                    //2.清空course
                     this.course = ''
+
+                    //显示提示信息
+                    this.show = true
                 }
             },
             computed:{
