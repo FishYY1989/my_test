@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>购物车</title>
+    <title>购物车render</title>
     <style>
         .active {
             background-color: #ddd;
@@ -26,14 +26,14 @@
         </p>
 
         <!--条件渲染-->
-        <p v-if="courses.lenght == 0">没有热河课程信息</p>
+        <p v-if="courses.length == 0">没有任何课程信息</p>
         <!--列表渲染-->
         <!-- <div v-for="c in courses" :key="c" :class="{active: selectedCourse === c}" @click="selectedCourse = c">
             {{ c }}
         </div> -->
 
         <!--style-->
-        <div class="course-list">
+        <div class="course-list" v-else>
             <div v-for="c in courses" :key="c" :style="{backgroundColor: (selectedCourse === c ? '#ddd' : 'transparent')}" 
                 @click="selectedCourse = c">
                 {{ c }}
@@ -50,7 +50,7 @@
                     title: '我的购物车',
                     course: '',
                     selectedCourse: '',
-                    courses: ['web全栈', 'web高级']
+                    courses: []
                 }
             },
             methods:{
@@ -60,8 +60,15 @@
                     //2.清空course
                     this.course = ''
                 }
-            }
+            },
+            // render(){
+            //     with(this){
+            //         return _c('div',{attrs:{"id":"app"}},[_c('h2',{attrs:{"title":title}},[_v("\n            "+_s(title)+"\n        ")]),_v(" "),_c('p',[_c('input',{directives:[{name:"model",rawName:"v-model",value:(course),expression:"course"}],attrs:{"type":"text"},domProps:{"value":(course)},on:{"keydown":function($event){if(!$event.type.indexOf('key')&&_k($event.keyCode,"enter",13,$event.key,"Enter"))return null;return addCourse.apply(null, arguments)},"input":function($event){if($event.target.composing)return;course=$event.target.value}}}),_v(" "),_c('button',{on:{"click":addCourse}},[_v("新增")])]),_v(" "),(courses.lenght == 0)?_c('p',[_v("没有热河课程信息")]):_e(),_v(" "),_c('div',{staticClass:"course-list"},_l((courses),function(c){return _c('div',{key:c,style:({backgroundColor: (selectedCourse === c ? '#ddd' : 'transparent')}),on:{"click":function($event){selectedCourse = c}}},[_v("\n                "+_s(c)+"\n            ")])}),0)])
+            //     }
+            // }
         })
+
+        console.log(app.$options.render);
     </script>
 </body>
 </html>
