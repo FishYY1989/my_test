@@ -28,6 +28,19 @@
         .message-box-close {
             float: right;
         }
+
+        /* 动画相关样式 */
+        /* 入场之前的状态 */
+        .fade-enter, 
+        .fade-leave-to{
+            opacity: 0
+        }
+
+        /* 过渡定义 */
+        .fade-enter-active, 
+        .fade-leave-active{
+            transition: opacity 1.5s
+        }
     </style>
 </head>
 
@@ -103,14 +116,16 @@
                 }
             },
             template: `
-                <div class="message-box" v-if="show">
-                    <!--具名插槽-->
-                    <slot name="title" title="恭喜">默认标题</slot>
-                    <!--通过slot获取传入内容-->
-                    <slot></slot>
-                    <span class="message-box-close" 
-                        @click="toggle">X</span>
-                </div>
+                <transition name="fade">
+                    <div class="message-box" v-if="show">
+                        <!--具名插槽-->
+                        <slot name="title" title="恭喜">默认标题</slot>
+                        <!--通过slot获取传入内容-->
+                        <slot></slot>
+                        <span class="message-box-close" 
+                            @click="toggle">X</span>
+                    </div>
+                </transition>
             `,
             mounted() {
                 this.$bus.$on('message-close', () => {
@@ -177,11 +192,13 @@
 
                 <!--style-->
                 <div class="course-list" v-else>
+                    <transition-group name="fade">
                     <div v-for="c in courses" :key="c.name" 
                         :style="{backgroundColor: (selectedCourse === c ? '#ddd' : 'transparent')}" 
                         @click="selectedCourse = c">
                         {{ c.name }} - ￥{{c.price}}
                     </div>
+                    </transition-group>
                 </div>
             </div>
             `

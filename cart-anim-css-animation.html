@@ -29,6 +29,8 @@
             float: right;
         }
     </style>
+    <!-- 引入CSS动画库 -->
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -103,14 +105,17 @@
                 }
             },
             template: `
-                <div class="message-box" v-if="show">
-                    <!--具名插槽-->
-                    <slot name="title" title="恭喜">默认标题</slot>
-                    <!--通过slot获取传入内容-->
-                    <slot></slot>
-                    <span class="message-box-close" 
-                        @click="toggle">X</span>
-                </div>
+                <transition enter-active-class="animated bounceIn"
+                    leave-active-class="animated bounceOut">
+                    <div class="message-box" v-if="show">
+                        <!--具名插槽-->
+                        <slot name="title" title="恭喜">默认标题</slot>
+                        <!--通过slot获取传入内容-->
+                        <slot></slot>
+                        <span class="message-box-close" 
+                            @click="toggle">X</span>
+                    </div>
+                </transition>
             `,
             mounted() {
                 this.$bus.$on('message-close', () => {

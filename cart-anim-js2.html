@@ -28,6 +28,19 @@
         .message-box-close {
             float: right;
         }
+
+        /* 动画相关样式 */
+        /* 入场之前的状态 */
+        /* .fade-enter, 
+        .fade-leave-to{
+            opacity: 0
+        } */
+
+        /* 过渡定义 */
+        /* .fade-enter-active, 
+        .fade-leave-active{
+            transition: opacity .5s
+        } */
     </style>
 </head>
 
@@ -89,6 +102,7 @@
             课程总数： {{totalCount}}
         </p>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>
     <script src="vue.js"></script>
     <script>
         //总线
@@ -103,14 +117,20 @@
                 }
             },
             template: `
-                <div class="message-box" v-if="show">
-                    <!--具名插槽-->
-                    <slot name="title" title="恭喜">默认标题</slot>
-                    <!--通过slot获取传入内容-->
-                    <slot></slot>
-                    <span class="message-box-close" 
-                        @click="toggle">X</span>
-                </div>
+                <transition name="fade" 
+                    @before-enter="beforeEnter"
+                    @enter="enter"
+                    @before-leave="beforeLeave"
+                    @leave="leave">
+                    <div class="message-box" v-if="show">
+                        <!--具名插槽-->
+                        <slot name="title" title="恭喜">默认标题</slot>
+                        <!--通过slot获取传入内容-->
+                        <slot></slot>
+                        <span class="message-box-close" 
+                            @click="toggle">X</span>
+                    </div>
+                </transition>
             `,
             mounted() {
                 this.$bus.$on('message-close', () => {
@@ -120,6 +140,20 @@
             methods: {
                 toggle() {
                     this.show = !this.show;
+                },
+                beforeEnter(el) {
+                    //动画初始状态
+                    el.style.opacity = 0;
+                },
+                enter(el, done) {
+                    Velocity(el, { opacity: 1 }, { duration: 1500, complete: done })
+                },
+                beforeLeave(el) {
+                    //动画初始状态
+                    el.style.opacity = 1;
+                },
+                leave(el, done) {
+                    Velocity(el, { opacity: 0 }, { duration: 1500, complete: done })
                 }
             },
         })
