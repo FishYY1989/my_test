@@ -107,13 +107,60 @@
         </p>
     </div>
     <script src="vue.js"></script>
-    <script src="./plugins/heading.js"></script>
     <script>
         //模拟用户角色
         const role = 'admin'
 
         //总线
         Vue.prototype.$bus = new Vue();
+
+        //heading组件
+        // <heading: :level="1" :title="title" icon="cart">{{title}}</heading>
+        //<h2 title=""></h2>
+        Vue.component('heading', {
+            functional: true, //函数式组件
+            props: {
+                level: {
+                    type: String,
+                    required: true
+                },
+                title: {
+                    title: String,
+                    defaule: ''
+                },
+                icon: {
+                    type: String
+                }
+            },
+            render(h, context) {
+                //子节点数组
+                let children = []
+                console.log(context);
+                //属性获取
+                const { icon, title, level } = context.props;
+
+                //icon属性处理逻辑
+                if (icon) {
+                    //<svg class="icon"><use xlink:href="#icon-cart"></svg>
+                    children.push(h(
+                        'svg',
+                        { class: 'icon' },
+                        [h('use', { attrs: { 'xlink:href': '#icon-' + icon } })]
+                    ))
+                }
+
+                //拼接子节点
+                children = children.concat(context.children)
+                const vnode = h(
+                    'h' + level, //参数1:tagname
+                    { attrs: { title } },//参数2:{....}
+                    children //参数3:子节点VNode数组
+                )
+                console.log(vnode)
+                //返回createElement返回的VNode
+                return vnode
+            }
+        })
 
         //弹窗组件
         Vue.component('message', {
